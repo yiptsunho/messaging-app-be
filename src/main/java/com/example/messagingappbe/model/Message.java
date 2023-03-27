@@ -16,5 +16,7 @@ public class Message {
     private String type;
     private String content;
     private LocalDateTime time;
-    private Long user_id;
+    private Long senderId;
+    private Long receiverId;
+    private Boolean group;
 }
