@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 public class Message {
 
     @Id
+    @Generated
     @NotNull(message = "message id must not be null")
     private Long id;
     @NotNull(message = "message type must not be null")
