@@ -11,18 +11,14 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table
-public class User {
+@Table(name = "chat_group")
+public class Group {
 
     @Id
-    @NotNull(message = "user id must not be null")
     @Generated
+    @NotNull(message = "group id must not be null")
     private Long id;
-    @NotNull(message = "name must not be null")
+    @NotNull(message = "group name must not be null")
     private String name;
-    @NotNull(message = "user emailAddress must not be null")
-    private String emailAddress;
-    @NotNull(message = "user password must not be null")
-    private String password;
     private byte[] avatar;
 }
