@@ -1,12 +1,8 @@
 package com.example.messagingappbe.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 
@@ -17,10 +13,16 @@ import java.time.LocalDateTime;
 @Builder
 @Table
 public class Message {
-
+//    @Id
+//    @GeneratedValue
+//    private Long id;
+//    private String senderName;
+//    private String receiverName;
+//    private String message;
+//    private String date;
+//    private MessageStatus messageStatus;
     @Id
-    @Generated
-    @NotNull(message = "message id must not be null")
+    @GeneratedValue
     private Long id;
     @NotNull(message = "message type must not be null")
     private String type;
@@ -32,7 +34,6 @@ public class Message {
     private Long senderId;
     private Long receiverId;
     private Long groupId;
-    @Column(name = "group?")
-    @NotNull(message = "message group must not be null")
-    private Boolean group;
+    @NotNull(message = "message isGroup must not be null")
+    private Boolean isGroup;
 }

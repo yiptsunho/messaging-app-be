@@ -1,6 +1,7 @@
 package com.example.messagingappbe.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -15,8 +16,7 @@ import lombok.*;
 public class Group {
 
     @Id
-    @Generated
-    @NotNull(message = "group id must not be null")
+    @GeneratedValue
     private Long id;
     @NotNull(message = "group name must not be null")
     private String name;

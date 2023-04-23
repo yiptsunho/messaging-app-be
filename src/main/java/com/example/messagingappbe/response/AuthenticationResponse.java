@@ -5,24 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
-public class CommonResponse {
+public class AuthenticationResponse {
     private Integer code;
     private String status;
     private String message;
-
-    public static CommonResponse success(String message) {
-        return CommonResponse.builder()
-                .code(200)
-                .status("success")
-                .message(message)
-                .build();
-    }
-    public static CommonResponse fail(Integer code, String message) {
-        return CommonResponse.builder()
+    private String accessToken;
+    private String refreshToken;
+    private Long userId;
+    private String displayName;
+    public AuthenticationResponse fail(Integer code, String message) {
+        return AuthenticationResponse.builder()
                 .code(code)
                 .status("fail")
                 .message(message)
