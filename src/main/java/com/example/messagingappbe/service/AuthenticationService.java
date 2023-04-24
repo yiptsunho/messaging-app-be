@@ -1,12 +1,17 @@
 package com.example.messagingappbe.service;
 
+import com.example.messagingappbe.model.RegisterVerificationToken;
 import com.example.messagingappbe.model.User;
+import com.example.messagingappbe.repository.RegisterVerificationTokenRepository;
 import com.example.messagingappbe.repository.UserRepository;
 import com.example.messagingappbe.request.LoginRequest;
 import com.example.messagingappbe.request.RegisterRequest;
 import com.example.messagingappbe.response.AuthenticationResponse;
 import com.example.messagingappbe.response.CommonResponse;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +24,10 @@ public class AuthenticationService {
     private static PasswordEncoder passwordEncoder;
     private static JwtService jwtService;
     private static AuthenticationManager authenticationManager;
+    private static EmailService emailService;
+    private static RegisterVerificationTokenRepository registerVerificationTokenRepository;
+    @Value("${domain.name}")
+    private static String domain;
 
     @Autowired
     public AuthenticationService (UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
@@ -46,9 +55,22 @@ public class AuthenticationService {
                 .phoneNumber(registerRequest.getPhoneNumber())
                 .emailAddress(emailAddress)
                 .avatar(registerRequest.getAvatar())
+                .verified(false)
                 .build();
         userRepository.save(newUser);
-        return CommonResponse.success("Register successful");
+
+        RegisterVerificationToken registerVerificationToken = new RegisterVerificationToken(newUser);
+
+        registerVerificationTokenRepository.save(registerVerificationToken);
+
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(newUser.getEmailAddress());
+        mail.setSubject("Complete registration!");
+        mail.setText("To confirm your account, please click here :" + domain +
+                "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
+        emailService.sendEmail(mail);
+
+        return CommonResponse.success("Register successful! A verification email has been sent to the user's email address");
     }
 
     public static AuthenticationResponse login(LoginRequest loginRequest) {

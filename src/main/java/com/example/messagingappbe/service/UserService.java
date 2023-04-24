@@ -1,7 +1,9 @@
 package com.example.messagingappbe.service;
 
+import com.example.messagingappbe.model.User;
 import com.example.messagingappbe.repository.UserRepository;
 import com.example.messagingappbe.request.CommonRequest;
+import com.example.messagingappbe.response.CommonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;

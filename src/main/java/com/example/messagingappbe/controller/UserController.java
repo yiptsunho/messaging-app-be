@@ -6,6 +6,7 @@ import com.example.messagingappbe.request.RegisterRequest;
 import com.example.messagingappbe.response.AuthenticationResponse;
 import com.example.messagingappbe.response.CommonResponse;
 import com.example.messagingappbe.service.AuthenticationService;
+import com.example.messagingappbe.service.EmailService;
 import com.example.messagingappbe.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private UserService userService;
+    private EmailService emailService;
 
     @Autowired
-    public void UserController(UserService userService) {
-        this.userService = userService;
+    public void UserController() {
     }
 
     @PostMapping("/register")
@@ -50,5 +51,11 @@ public class UserController {
     public String addContact(@RequestBody CommonRequest commonRequest) {
         return UserService.addContact(commonRequest);
     }
+
+    @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
+    public CommonResponse confirmAccount(@RequestParam("token") String token) {
+        return emailService.verifyEmail(token);
+    }
+
 
 }

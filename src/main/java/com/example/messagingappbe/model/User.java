@@ -30,6 +30,8 @@ public class User implements UserDetails {
     @NotNull(message = "user password must not be null")
     private String password;
     private byte[] avatar;
+    @NotNull(message = "verified must not be null")
+    private Boolean verified;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -64,5 +66,10 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public User() { // initialize verified as false
+        super();
+        this.verified = false;
     }
 }
