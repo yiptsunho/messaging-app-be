@@ -17,14 +17,14 @@ import java.util.UUID;
 @Table
 public class RegisterVerificationToken {
 
-    private static final Integer EXPIRATION = 60 * 24;
+    private static final Integer EXPIRATION = 60 * 24; // the verification token will expire in 1 day
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String token;
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "id")
+    @JoinColumn(nullable = false, name = "user_id")
     private User user;
     private Date expiryDate;
     private Date calculateExpiryDate(Integer expiryTimeInMinute) {

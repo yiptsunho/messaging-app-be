@@ -13,16 +13,9 @@ import java.time.LocalDateTime;
 @Builder
 @Table
 public class Message {
-//    @Id
-//    @GeneratedValue
-//    private Long id;
-//    private String senderName;
-//    private String receiverName;
-//    private String message;
-//    private String date;
-//    private MessageStatus messageStatus;
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull(message = "message type must not be null")
     private String type;

@@ -30,20 +30,24 @@ public class AuthenticationService {
     private static String domain;
 
     @Autowired
-    public AuthenticationService (UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public AuthenticationService (UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager,
+                                  EmailService emailService, RegisterVerificationTokenRepository registerVerificationTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.emailService = emailService;
+        this.registerVerificationTokenRepository = registerVerificationTokenRepository;
     }
 
 
     public static CommonResponse register(RegisterRequest registerRequest) {
         System.out.println("start register.....");
+        String username = registerRequest.getUsername();
         String emailAddress = registerRequest.getEmailAddress();
         String password = registerRequest.getPassword();
-        if (emailAddress == null || password == null) {
-            return CommonResponse.fail(400, "username or password must not be null");
+        if (username == null || emailAddress == null || password == null) {
+            return CommonResponse.fail(400, "username, emailAddress or password must not be null");
         }
         Boolean duplicateEmailAddress = userRepository.existsByEmailAddress(registerRequest.getEmailAddress());
         if (duplicateEmailAddress) {

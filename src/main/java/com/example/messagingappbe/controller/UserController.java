@@ -1,5 +1,6 @@
 package com.example.messagingappbe.controller;
 
+import com.example.messagingappbe.model.User;
 import com.example.messagingappbe.request.CommonRequest;
 import com.example.messagingappbe.request.LoginRequest;
 import com.example.messagingappbe.request.RegisterRequest;
@@ -19,7 +20,9 @@ public class UserController {
     private EmailService emailService;
 
     @Autowired
-    public void UserController() {
+    public void UserController(UserService userService, EmailService emailService) {
+        this.userService = userService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/register")
