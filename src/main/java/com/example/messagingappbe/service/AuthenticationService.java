@@ -63,18 +63,7 @@ public class AuthenticationService {
                 .build();
         userRepository.save(newUser);
 
-        RegisterVerificationToken registerVerificationToken = new RegisterVerificationToken(newUser);
-
-        registerVerificationTokenRepository.save(registerVerificationToken);
-
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(newUser.getEmailAddress());
-        mail.setSubject("Complete registration!");
-        mail.setText("To confirm your account, please click here :" + domain +
-                "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
-        emailService.sendEmail(mail);
-
-        return CommonResponse.success("Register successful! A verification email has been sent to the user's email address");
+        return sendVerificationEmail(newUser);
     }
 
     public static AuthenticationResponse login(LoginRequest loginRequest) {
@@ -86,6 +75,11 @@ public class AuthenticationService {
         );
         var user = userRepository.findByEmailAddress(loginRequest.getEmailAddress())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Boolean verified = user.getVerified();
+        if (!verified) {
+            return AuthenticationResponse.fail(400, "Account not yet verified");
+        }
         var accessToken = jwtService.generateAccessToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         return AuthenticationResponse.builder()
@@ -97,5 +91,21 @@ public class AuthenticationService {
                 .userId(user.getId())
                 .displayName(user.getName())
                 .build();
+    }
+
+    public static CommonResponse sendVerificationEmail(User user) {
+
+        RegisterVerificationToken registerVerificationToken = new RegisterVerificationToken(user);
+
+        registerVerificationTokenRepository.save(registerVerificationToken);
+
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(user.getEmailAddress());
+        mail.setSubject("Complete registration!");
+        mail.setText("To confirm your account, please click here :" + domain +
+                "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
+        emailService.sendEmail(mail);
+
+        return CommonResponse.success("Register successful! A verification email has been sent to the user's email address");
     }
 }

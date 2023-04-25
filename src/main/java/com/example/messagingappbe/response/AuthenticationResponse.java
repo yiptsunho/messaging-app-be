@@ -17,7 +17,7 @@ public class AuthenticationResponse {
     private String refreshToken;
     private Long userId;
     private String displayName;
-    public AuthenticationResponse fail(Integer code, String message) {
+    public static AuthenticationResponse fail(Integer code, String message) {
         return AuthenticationResponse.builder()
                 .code(code)
                 .status("fail")
