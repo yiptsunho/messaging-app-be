@@ -1,9 +1,6 @@
 package com.example.messagingappbe.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,13 +11,12 @@ import java.util.Collection;
 @Entity
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 @Builder
-@Table
+@Table(name = "user")
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull(message = "user name must not be null")
     private String name;

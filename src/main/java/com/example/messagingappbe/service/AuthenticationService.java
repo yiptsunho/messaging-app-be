@@ -8,7 +8,6 @@ import com.example.messagingappbe.request.LoginRequest;
 import com.example.messagingappbe.request.RegisterRequest;
 import com.example.messagingappbe.response.AuthenticationResponse;
 import com.example.messagingappbe.response.CommonResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -17,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -30,20 +31,24 @@ public class AuthenticationService {
     private static String domain;
 
     @Autowired
-    public AuthenticationService (UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public AuthenticationService (UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager,
+                                  EmailService emailService, RegisterVerificationTokenRepository registerVerificationTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.emailService = emailService;
+        this.registerVerificationTokenRepository = registerVerificationTokenRepository;
     }
 
 
     public static CommonResponse register(RegisterRequest registerRequest) {
         System.out.println("start register.....");
+        String username = registerRequest.getUsername();
         String emailAddress = registerRequest.getEmailAddress();
         String password = registerRequest.getPassword();
-        if (emailAddress == null || password == null) {
-            return CommonResponse.fail(400, "username or password must not be null");
+        if (username == null || emailAddress == null || password == null) {
+            return CommonResponse.fail(400, "username, emailAddress or password must not be null");
         }
         Boolean duplicateEmailAddress = userRepository.existsByEmailAddress(registerRequest.getEmailAddress());
         if (duplicateEmailAddress) {
@@ -59,18 +64,7 @@ public class AuthenticationService {
                 .build();
         userRepository.save(newUser);
 
-        RegisterVerificationToken registerVerificationToken = new RegisterVerificationToken(newUser);
-
-        registerVerificationTokenRepository.save(registerVerificationToken);
-
-        SimpleMailMessage mail = new SimpleMailMessage();
-        mail.setTo(newUser.getEmailAddress());
-        mail.setSubject("Complete registration!");
-        mail.setText("To confirm your account, please click here :" + domain +
-                "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
-        emailService.sendEmail(mail);
-
-        return CommonResponse.success("Register successful! A verification email has been sent to the user's email address");
+        return resendVerificationEmail(newUser);
     }
 
     public static AuthenticationResponse login(LoginRequest loginRequest) {
@@ -82,6 +76,11 @@ public class AuthenticationService {
         );
         var user = userRepository.findByEmailAddress(loginRequest.getEmailAddress())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Boolean verified = user.getVerified();
+        if (!verified) {
+            return AuthenticationResponse.fail(400, "Account not yet verified");
+        }
         var accessToken = jwtService.generateAccessToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         return AuthenticationResponse.builder()
@@ -93,5 +92,47 @@ public class AuthenticationService {
                 .userId(user.getId())
                 .displayName(user.getName())
                 .build();
+    }
+
+    public static CommonResponse resendVerificationEmail(User user) {
+
+        RegisterVerificationToken registerVerificationToken = new RegisterVerificationToken(user);
+
+        registerVerificationTokenRepository.save(registerVerificationToken);
+
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(user.getEmailAddress());
+        mail.setSubject("Complete registration!");
+        mail.setText("To confirm your account, please click here :" + domain +
+                "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
+        emailService.sendEmail(mail);
+
+        return CommonResponse.success("Register successful! A verification email has been sent to the user's email address");
+    }
+
+    public static CommonResponse resendVerificationEmail(Long id) {
+
+        Optional<User> user = userRepository.findById(id);
+        if (user.get() == null) {
+            return CommonResponse.fail(400, "Invalid user id");
+        }
+        if (user.get().getVerified() == true) {
+            return CommonResponse.fail(400, "Invalid user id");
+        }
+
+        registerVerificationTokenRepository.invalidateAllCurrentToken(id);
+
+        RegisterVerificationToken registerVerificationToken = new RegisterVerificationToken(user.get());
+
+        registerVerificationTokenRepository.save(registerVerificationToken);
+
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(user.get().getEmailAddress());
+        mail.setSubject("Complete registration!");
+        mail.setText("To confirm your account, please click here :" + domain +
+                "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
+        emailService.sendEmail(mail);
+
+        return CommonResponse.success("Register successful! A verification email has been sent to the user's email address");
     }
 }

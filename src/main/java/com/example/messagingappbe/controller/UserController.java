@@ -19,7 +19,9 @@ public class UserController {
     private EmailService emailService;
 
     @Autowired
-    public void UserController() {
+    public void UserController(UserService userService, EmailService emailService) {
+        this.userService = userService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/register")
@@ -30,6 +32,11 @@ public class UserController {
     @PostMapping("/login")
     public AuthenticationResponse login(@RequestBody LoginRequest loginRequest) {
         return AuthenticationService.login(loginRequest);
+    }
+
+    @PostMapping("/resendVerification")
+    public CommonResponse resendVerificationEmail(@RequestParam Long id) {
+        return AuthenticationService.resendVerificationEmail(id);
     }
 
     @PutMapping("/user")
@@ -54,7 +61,7 @@ public class UserController {
 
     @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
     public CommonResponse confirmAccount(@RequestParam("token") String token) {
-        return emailService.verifyEmail(token);
+        return emailService.verifyAccount(token);
     }
 
 
