@@ -14,7 +14,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table
+@Table(name = "register_verification_token")
 public class RegisterVerificationToken {
 
     private static final Integer EXPIRATION = 60 * 24; // the verification token will expire in 1 day
@@ -27,6 +27,7 @@ public class RegisterVerificationToken {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
     private Date expiryDate;
+    private Boolean active;
     private Date calculateExpiryDate(Integer expiryTimeInMinute) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Timestamp(cal.getTime().getTime()));
@@ -37,5 +38,6 @@ public class RegisterVerificationToken {
         this.user = user;
         expiryDate = calculateExpiryDate(EXPIRATION);
         token = UUID.randomUUID().toString();
+        active = true;
     }
 }

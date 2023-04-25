@@ -33,7 +33,7 @@ public class EmailService {
         javaMailSender.send(mail);
     }
 
-    public CommonResponse verifyEmail(String registerVerificationToken) {
+    public CommonResponse verifyAccount(String registerVerificationToken) {
         RegisterVerificationToken token = registerVerificationTokenRepository.findByToken(registerVerificationToken);
 
         if (token == null) {
@@ -41,7 +41,8 @@ public class EmailService {
         }
 
         Date current = new Date();
-        if (token.getExpiryDate().before(current)) {
+        Boolean active = token.getActive();
+        if (token.getExpiryDate().before(current) || !active) {
             return CommonResponse.fail(400, "Token has already expired");
         }
 

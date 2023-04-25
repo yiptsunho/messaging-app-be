@@ -1,6 +1,5 @@
 package com.example.messagingappbe.controller;
 
-import com.example.messagingappbe.model.User;
 import com.example.messagingappbe.request.CommonRequest;
 import com.example.messagingappbe.request.LoginRequest;
 import com.example.messagingappbe.request.RegisterRequest;
@@ -35,6 +34,11 @@ public class UserController {
         return AuthenticationService.login(loginRequest);
     }
 
+    @PostMapping("/resendVerification")
+    public CommonResponse resendVerificationEmail(@RequestParam Long id) {
+        return AuthenticationService.resendVerificationEmail(id);
+    }
+
     @PutMapping("/user")
     public String updateUser(@RequestBody CommonRequest commonRequest) {
         return UserService.updateUser(commonRequest);
@@ -57,7 +61,7 @@ public class UserController {
 
     @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
     public CommonResponse confirmAccount(@RequestParam("token") String token) {
-        return emailService.verifyEmail(token);
+        return emailService.verifyAccount(token);
     }
 
 

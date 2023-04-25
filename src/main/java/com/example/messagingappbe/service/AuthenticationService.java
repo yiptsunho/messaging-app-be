@@ -8,7 +8,6 @@ import com.example.messagingappbe.request.LoginRequest;
 import com.example.messagingappbe.request.RegisterRequest;
 import com.example.messagingappbe.response.AuthenticationResponse;
 import com.example.messagingappbe.response.CommonResponse;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -17,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -63,7 +64,7 @@ public class AuthenticationService {
                 .build();
         userRepository.save(newUser);
 
-        return sendVerificationEmail(newUser);
+        return resendVerificationEmail(newUser);
     }
 
     public static AuthenticationResponse login(LoginRequest loginRequest) {
@@ -93,7 +94,7 @@ public class AuthenticationService {
                 .build();
     }
 
-    public static CommonResponse sendVerificationEmail(User user) {
+    public static CommonResponse resendVerificationEmail(User user) {
 
         RegisterVerificationToken registerVerificationToken = new RegisterVerificationToken(user);
 
@@ -101,6 +102,32 @@ public class AuthenticationService {
 
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setTo(user.getEmailAddress());
+        mail.setSubject("Complete registration!");
+        mail.setText("To confirm your account, please click here :" + domain +
+                "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
+        emailService.sendEmail(mail);
+
+        return CommonResponse.success("Register successful! A verification email has been sent to the user's email address");
+    }
+
+    public static CommonResponse resendVerificationEmail(Long id) {
+
+        Optional<User> user = userRepository.findById(id);
+        if (user.get() == null) {
+            return CommonResponse.fail(400, "Invalid user id");
+        }
+        if (user.get().getVerified() == true) {
+            return CommonResponse.fail(400, "Invalid user id");
+        }
+
+        registerVerificationTokenRepository.invalidateAllCurrentToken(id);
+
+        RegisterVerificationToken registerVerificationToken = new RegisterVerificationToken(user.get());
+
+        registerVerificationTokenRepository.save(registerVerificationToken);
+
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setTo(user.get().getEmailAddress());
         mail.setSubject("Complete registration!");
         mail.setText("To confirm your account, please click here :" + domain +
                 "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
