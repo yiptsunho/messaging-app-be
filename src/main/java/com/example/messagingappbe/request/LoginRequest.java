@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class LoginRequest {
 
     @NotNull(message = "emailAddress must not be null")

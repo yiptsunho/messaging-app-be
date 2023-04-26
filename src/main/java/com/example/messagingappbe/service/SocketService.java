@@ -25,9 +25,9 @@ public class SocketService {
     }
 
     public static Message sendMessage(Message message) {
-        Long receiverId = message.getReceiverId();
-        Long senderId = message.getSenderId();
-        Long groupId = message.getGroupId();
+        Long receiverId = message.getReceiver().getId();
+        Long senderId = message.getSender().getId();
+        Long groupId = message.getGroup().getId();
         Boolean isGroup = message.getIsGroup();
 
         if (senderId == null) {
@@ -54,7 +54,7 @@ public class SocketService {
         if (message.getType() == null || message.getContent() == null || message.getDateTime() == null) {
             throw new IllegalStateException("type, content or datetime must not be null");
         }
-        simpMessagingTemplate.convertAndSendToUser(message.getReceiverId().toString(), "", message); // /user/David/private
+        simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getId().toString(), "", message); // /user/David/private
         messageRepository.save(message);
         return message;
     }

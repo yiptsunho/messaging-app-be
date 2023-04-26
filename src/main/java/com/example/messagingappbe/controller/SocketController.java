@@ -29,7 +29,7 @@ public class SocketController {
 
     @MessageMapping("/message")
     public Message receivePrivateMessage(@Payload Message message) {
-        simpMessagingTemplate.convertAndSendToUser(String.valueOf(message.getReceiverId()), "", message); // /user/David/private
+//        simpMessagingTemplate.convertAndSendToUser(String.valueOf(message.getReceiver().getId()), "", message); // /user/David/private
 //        return message;
         return SocketService.sendMessage(message);
     }

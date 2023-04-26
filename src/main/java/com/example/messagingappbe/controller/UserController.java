@@ -34,6 +34,11 @@ public class UserController {
         return AuthenticationService.login(loginRequest);
     }
 
+    @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
+    public CommonResponse confirmAccount(@RequestParam("token") String token) {
+        return emailService.verifyAccount(token);
+    }
+
     @PostMapping("/resendVerification")
     public CommonResponse resendVerificationEmail(@RequestParam Long id) {
         return AuthenticationService.resendVerificationEmail(id);
@@ -59,10 +64,9 @@ public class UserController {
         return UserService.addContact(commonRequest);
     }
 
-    @RequestMapping(value = "/confirm-account", method = {RequestMethod.GET, RequestMethod.POST})
-    public CommonResponse confirmAccount(@RequestParam("token") String token) {
-        return emailService.verifyAccount(token);
+    @PostMapping("/accept")
+    public CommonResponse acceptChatRequest(@RequestParam Long id) {
+        return null;
     }
-
 
 }

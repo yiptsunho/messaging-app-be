@@ -133,6 +133,6 @@ public class AuthenticationService {
                 "api/v1/user/confirm-account?token=" + registerVerificationToken.getToken());
         emailService.sendEmail(mail);
 
-        return CommonResponse.success("Register successful! A verification email has been sent to the user's email address");
+        return CommonResponse.success("Resend verification email successful!");
     }
 }

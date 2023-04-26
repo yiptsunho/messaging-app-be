@@ -22,11 +22,15 @@ public class RegisterVerificationToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String token;
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
+
     private Date expiryDate;
+
     private Boolean active;
     private Date calculateExpiryDate(Integer expiryTimeInMinute) {
         Calendar cal = Calendar.getInstance();

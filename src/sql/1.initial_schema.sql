@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `phone_number` varchar(255) DEFAULT NULL,
   `verified` bit(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `message` (
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -18,7 +18,13 @@ CREATE TABLE IF NOT EXISTS `message` (
   `receiver_id` bigint DEFAULT NULL,
   `sender_id` bigint NOT NULL,
   `type` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `FKgvr0ylqjhbi2cvnlbr1lskyya` (`group_id`),
+  KEY `FK86f0kc2mt26ifwupnivu6v8oa` (`receiver_id`),
+  KEY `FKcnj2qaf5yc36v2f90jw2ipl9b` (`sender_id`),
+  CONSTRAINT `FK86f0kc2mt26ifwupnivu6v8oa` FOREIGN KEY (`receiver_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKcnj2qaf5yc36v2f90jw2ipl9b` FOREIGN KEY (`sender_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKgvr0ylqjhbi2cvnlbr1lskyya` FOREIGN KEY (`group_id`) REFERENCES `chat_group` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE IF NOT EXISTS `chat_group` (
@@ -33,5 +39,19 @@ CREATE TABLE IF NOT EXISTS `register_verification_token` (
   `expiry_date` datetime(6) DEFAULT NULL,
   `token` varchar(255) DEFAULT NULL,
   `user_id` bigint NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `active` bit(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK829rv15sh5fkgxceh6sl85prq` (`user_id`),
+  CONSTRAINT `FK829rv15sh5fkgxceh6sl85prq` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `user_to_group` (
+  `user_id` bigint NOT NULL,
+  `group_id` bigint NOT NULL,
+  KEY `FKglyqmlqmme5vg9n25ekra7kgh` (`group_id`),
+  KEY `FKmc3ldwvpe48shqdy7kn7yk31k` (`user_id`),
+  CONSTRAINT `FKglyqmlqmme5vg9n25ekra7kgh` FOREIGN KEY (`group_id`) REFERENCES `chat_group` (`id`),
+  CONSTRAINT `FKmc3ldwvpe48shqdy7kn7yk31k` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+

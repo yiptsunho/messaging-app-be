@@ -31,6 +31,7 @@ public class UserService {
     }
     // add contact api (by email address or by id)
     public static String addContact(@RequestBody CommonRequest commonRequest) {
+
         return null;
     }
 
