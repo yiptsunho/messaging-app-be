@@ -1,10 +1,12 @@
 package com.example.messagingappbe.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,10 +17,18 @@ import lombok.*;
 public class Group {
 
     @Id
-    @Generated
-    @NotNull(message = "group id must not be null")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @NotNull(message = "group name must not be null")
     private String name;
     private byte[] avatar;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_to_group",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> users;
 }

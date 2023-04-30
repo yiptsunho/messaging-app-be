@@ -1,35 +1,44 @@
 package com.example.messagingappbe.controller;
 
-import com.example.messagingappbe.model.Message;
+import com.example.messagingappbe.request.CommonRequest;
 import com.example.messagingappbe.response.CommonResponse;
 import com.example.messagingappbe.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Objects;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("api/v1/message")
 public class MessageController {
+
     private MessageService messageService;
 
     @Autowired
-    public void MessageController(MessageService messageService) {
+    public MessageController(MessageService messageService) {
         this.messageService = messageService;
     }
 
-    @MessageMapping("/message") //app/message
-    @SendTo("/chatroom/public")
-    public Message receivePublicMessage(@Payload Message message) {
-        return messageService.receivePublicMessage(message);
+    @GetMapping()
+    public CommonResponse getRecentChat(@RequestParam Long id) {
+        return MessageService.getRecentChat(id);
     }
 
-    @MessageMapping("/private-message")
+    @GetMapping("/private")
+    public CommonResponse getPrivateMessage(@RequestParam Long senderId, Long receiverId) {
+        return MessageService.getPrivateMessage(senderId, receiverId);
+    }
 
-    public Message receivePrivateMessage(@Payload Message message) {
-        return messageService.receivePrivateMessage(message);
+    @GetMapping("/group")
+    public CommonResponse getGroupMessage(@RequestParam Long requesterId, Long groupId) {
+        return MessageService.getGroupMessage(requesterId, groupId);
+    }
+
+    @PutMapping()
+    public String updateMessage(@RequestBody CommonRequest commonRequest) {
+        return MessageService.updateMessage(commonRequest);
+    }
+
+    @DeleteMapping()
+    public String deleteMessage(@RequestParam Long messageId) {
+        return MessageService.deleteMessage(messageId);
     }
 }

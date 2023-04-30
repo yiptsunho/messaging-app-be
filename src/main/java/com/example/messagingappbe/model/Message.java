@@ -1,12 +1,8 @@
 package com.example.messagingappbe.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 
@@ -14,25 +10,36 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "message")
 @Builder
-@Table
 public class Message {
 
     @Id
-    @Generated
-    @NotNull(message = "message id must not be null")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @NotNull(message = "message type must not be null")
     private String type;
+
     @NotNull(message = "message content must not be null")
     private String content;
+
     @NotNull(message = "message dateTime must not be null")
     private LocalDateTime dateTime;
+
     @NotNull(message = "message senderId must not be null")
-    private Long senderId;
-    private Long receiverId;
-    private Long groupId;
-    @Column(name = "group?")
-    @NotNull(message = "message group must not be null")
-    private Boolean group;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false, name = "sender_id")
+    private User sender;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "group_id")
+    private Group group;
+
+    @NotNull(message = "message isGroup must not be null")
+    private Boolean isGroup;
 }

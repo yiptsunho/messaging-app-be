@@ -9,10 +9,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
+@Builder
+public class RegisterRequest {
 
-    @NotNull(message = "emailAddress must not be null")
-    private String emailAddress;
+    @NotNull(message = "username must not be null")
+    private String username;
     @NotNull(message = "password must not be null")
     private String password;
+    private String phoneNumber;
+    @NotNull(message = "emailAddress must not be null")
+    private String emailAddress;
+    private byte[] avatar;
 }
