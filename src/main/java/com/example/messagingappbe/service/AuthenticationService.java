@@ -48,7 +48,7 @@ public class AuthenticationService {
         String emailAddress = registerRequest.getEmailAddress();
         String password = registerRequest.getPassword();
         if (username == null || emailAddress == null || password == null) {
-            return CommonResponse.fail(400, "username, emailAddress or password must not be null");
+            return CommonResponse.fail(400, "invalid parameter");
         }
         Boolean duplicateEmailAddress = userRepository.existsByEmailAddress(registerRequest.getEmailAddress());
         if (duplicateEmailAddress) {
@@ -114,10 +114,10 @@ public class AuthenticationService {
 
         Optional<User> user = userRepository.findById(id);
         if (user.get() == null) {
-            return CommonResponse.fail(400, "Invalid user id");
+            return CommonResponse.fail(400, "invalid parameter");
         }
         if (user.get().getVerified() == true) {
-            return CommonResponse.fail(400, "Invalid user id");
+            return CommonResponse.fail(400, "invalid parameter");
         }
 
         registerVerificationTokenRepository.invalidateAllCurrentToken(id);

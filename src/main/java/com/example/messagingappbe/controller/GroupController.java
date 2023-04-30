@@ -22,7 +22,6 @@ public class GroupController {
 
     @PostMapping()
     public CommonResponse createGroup(@RequestBody GroupRequest groupRequest) {
-        System.out.println("Reached controller");
         return groupService.createGroup(groupRequest);
     }
 

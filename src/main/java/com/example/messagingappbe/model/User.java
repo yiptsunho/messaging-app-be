@@ -39,6 +39,22 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "users")
     private List<Group> groups;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "contacts",
+            joinColumns = @JoinColumn(name = "id"),
+            inverseJoinColumns = @JoinColumn(name = "contact_id")
+    )
+    private List<User> contacts;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "contacts",
+            joinColumns = @JoinColumn(name = "contact_id"),
+            inverseJoinColumns = @JoinColumn(name = "id")
+    )
+    private List<User> contactOf;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return null;

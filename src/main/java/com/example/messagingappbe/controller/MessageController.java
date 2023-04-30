@@ -18,8 +18,18 @@ public class MessageController {
     }
 
     @GetMapping()
-    public String getAllMessage(@RequestParam Long userId) {
-        return MessageService.getAllMessage(userId);
+    public CommonResponse getRecentChat(@RequestParam Long id) {
+        return MessageService.getRecentChat(id);
+    }
+
+    @GetMapping("/private")
+    public CommonResponse getPrivateMessage(@RequestParam Long senderId, Long receiverId) {
+        return MessageService.getPrivateMessage(senderId, receiverId);
+    }
+
+    @GetMapping("/group")
+    public CommonResponse getGroupMessage(@RequestParam Long requesterId, Long groupId) {
+        return MessageService.getGroupMessage(requesterId, groupId);
     }
 
     @PutMapping()

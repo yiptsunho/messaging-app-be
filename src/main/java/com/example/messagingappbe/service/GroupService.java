@@ -1,6 +1,6 @@
 package com.example.messagingappbe.service;
 
-import com.example.messagingappbe.dto.GroupInfoDto;
+import com.example.messagingappbe.dto.GroupDto;
 import com.example.messagingappbe.dto.UserDto;
 import com.example.messagingappbe.model.Group;
 import com.example.messagingappbe.model.User;
@@ -21,49 +21,55 @@ public class GroupService {
 
     private UserRepository userRepository;
 
-    private ModelMapper modelMapper;
-
-    public GroupService(GroupRepository groupRepository, UserRepository userRepository, ModelMapper modelMapper) {
+    public GroupService(GroupRepository groupRepository, UserRepository userRepository) {
         this.groupRepository = groupRepository;
         this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
     }
 
     public CommonResponse getGroupInfo(Long id) {
         Boolean exists = groupRepository.existsById(id);
         if (!exists) {
-            return CommonResponse.fail(400, "invalid group id");
+            return CommonResponse.fail(400, "invalid parameter");
         }
 
-        Optional<Group> group = groupRepository.findById(id);
-        List<UserDto> userList = groupRepository.findUserInGroupByGroupId(id);
+        GroupDto groupDto = groupRepository.findGroupById(id);
+        List<UserDto> userList = groupRepository.findUserByGroupId(id);
 
-//        List<UserDto> userDtoList = userList.stream().map(user -> modelMapper.map(user, UserDto.class)).toList();
-        GroupInfoDto groupInfoDto = modelMapper.map(group, GroupInfoDto.class);
-        groupInfoDto.setUserList(userList);
+        Boolean isGroupMember = userList.stream().anyMatch(userDto -> userDto.getId() == id);
+        if (!isGroupMember) {
+            return CommonResponse.fail(400, "invalid parameter");
+        }
 
-        return CommonResponse.success(groupInfoDto);
+        groupDto.setUserList(userList);
+
+        return CommonResponse.success(groupDto);
     }
 
     public CommonResponse createGroup(GroupRequest groupRequest) {
         if (StringUtils.isEmpty(groupRequest.getName())) {
-            return CommonResponse.fail(400, "group name must not be null or empty");
+            return CommonResponse.fail(400, "invalid parameter");
         }
 
         if (groupRequest.getUserList().isEmpty()) {
-            return CommonResponse.fail(400, "user list must not be empty");
+            return CommonResponse.fail(400, "invalid parameter");
         }
+
 
         // block if user list contain duplicate id
         Set<Long> userIdList = new HashSet<>();
         for (Long id: groupRequest.getUserList()) {
             if (userIdList.contains(id)) {
-                return CommonResponse.fail(400, "user list cannot contain duplicate id");
+                return CommonResponse.fail(400, "invalid parameter");
             }
             userIdList.add(id);
         }
 
-        List<User> userList = userRepository.findAllByIdList(userIdList);
+        List<User> userList = userRepository.findAllById(userIdList);
+        Boolean allUserExist = userList.size() == userIdList.size();
+        if (!allUserExist) {
+            return CommonResponse.fail(400, "invalid parameter");
+        }
+
         Group group = Group.builder()
                 .name(groupRequest.getName())
                 .avatar(groupRequest.getAvatar())

@@ -55,7 +55,18 @@ public class SocketService {
             throw new IllegalStateException("type, content or datetime must not be null");
         }
         simpMessagingTemplate.convertAndSendToUser(message.getReceiver().getId().toString(), "", message); // /user/David/private
-        messageRepository.save(message);
+
+        Message newMessage = Message.builder()
+                .type(message.getType())
+                .content(message.getContent())
+                .dateTime(message.getDateTime())
+                .sender(message.getSender())
+                .receiver(message.getReceiver())
+                .group(message.getGroup())
+                .isGroup(message.getIsGroup())
+                .build();
+
+        messageRepository.save(newMessage);
         return message;
     }
 }

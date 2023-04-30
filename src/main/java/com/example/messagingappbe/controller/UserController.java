@@ -59,14 +59,4 @@ public class UserController {
         return UserService.forgetPassword(commonRequest);
     }
 
-    @PostMapping("/add")
-    public String addContact(@RequestBody CommonRequest commonRequest) {
-        return UserService.addContact(commonRequest);
-    }
-
-    @PostMapping("/accept")
-    public CommonResponse acceptChatRequest(@RequestParam Long id) {
-        return null;
-    }
-
 }

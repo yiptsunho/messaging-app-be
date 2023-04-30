@@ -1,22 +1,22 @@
 package com.example.messagingappbe.service;
 
-import com.example.messagingappbe.model.User;
 import com.example.messagingappbe.repository.UserRepository;
 import com.example.messagingappbe.request.CommonRequest;
 import com.example.messagingappbe.response.CommonResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.*;
 
 @Service
 public class UserService {
 
-    private UserRepository userRepository;
+    private static UserRepository userRepository;
 
-    @Autowired
-    public void UserService (UserRepository userRepository) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
     // update user detail api
     public static String updateUser(@RequestBody CommonRequest commonRequest) {
         return null;
@@ -29,12 +29,6 @@ public class UserService {
     public static String forgetPassword(@RequestBody CommonRequest commonRequest) {
         return null;
     }
-    // add contact api (by email address or by id)
-    public static String addContact(@RequestBody CommonRequest commonRequest) {
-
-        return null;
-    }
-
 
 //    public static CommonResponse register(RegisterRequest registerRequest) {
 //        String username = registerRequest.getUsername();
